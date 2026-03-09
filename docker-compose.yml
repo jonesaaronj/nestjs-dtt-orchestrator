@@ -1,0 +1,36 @@
+services:
+  nestjs-orchestrator-app:
+    container_name: nestjs-orchestrator-app
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - './:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    networks:
+      - nestjs-net
+    depends_on:
+      - orchestrator-postgres-db
+
+  orchestrator-postgres-db:
+    container_name: orchestrator-postgres-db
+    image: postgres:16-alpine
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/postgres_data:/var/lib/postgresql/data
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    networks:
+      - nestjs-net
+
+networks:
+  nestjs-net:
