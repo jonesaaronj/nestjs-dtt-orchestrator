@@ -14,6 +14,8 @@ import { GetRatioRequestDto } from './dto/GetRatioRequest.dto';
 import { GetRatioResponseDto } from './dto/GetRatioResponse.dto';
 import { ReportRatioResponseDto } from './dto/ReportRatioResponse.dto';
 import type { Request } from 'express';
+import { PermissionName } from 'src/jwt/jwt-payload.type';
+import { permissionGate } from 'src/utils/permissionGate';
 
 @Controller('ratio')
 export class RatioController {
@@ -24,13 +26,9 @@ export class RatioController {
     @Body() reportRatioRequest: ReportRatioRequestDto,
     @Req() request: Request,
   ): Promise<ReportRatioResponseDto> {
-    const userKey = request.user?.sub;
-
-    if (!userKey) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
-
-    return this.ratioService.reportRatio(userKey, reportRatioRequest);
+    return permissionGate(request, PermissionName.Viewer, (userKey) =>
+      this.ratioService.reportRatio(userKey, reportRatioRequest),
+    );
   }
 
   @Get()
@@ -38,12 +36,8 @@ export class RatioController {
     @Query() getRatioRequest: GetRatioRequestDto,
     @Req() request: Request,
   ): Promise<GetRatioResponseDto> {
-    const userKey = request.user?.sub;
-
-    if (!userKey) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
-
-    return this.ratioService.getRatio(userKey, getRatioRequest.current);
+    return permissionGate(request, PermissionName.Viewer, (userKey) =>
+      this.ratioService.getRatio(userKey, getRatioRequest.current),
+    );
   }
 }

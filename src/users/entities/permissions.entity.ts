@@ -8,8 +8,10 @@ import {
 } from 'typeorm';
 import { Role } from './roles.entity';
 
-export enum PermissionName {
+// do not export
+enum PermissionName {
   Viewer = 'viewer',
+  TrackerRegister = 'tracker:register',
 }
 
 @Entity('permissions')

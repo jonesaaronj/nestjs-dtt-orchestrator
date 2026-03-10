@@ -15,11 +15,14 @@ import { LoginRequestDto } from './dto/LoginRequest.dto';
 import { RegisterRequestDto } from './dto/RegisterRequest.dto';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CustomJwtPayload, PermissionName } from 'src/jwt/jwt-payload.type';
+import { permissionGate } from 'src/utils/permissionGate';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // TODO: protect registration???
   @Post('register')
   async register(@Body() registerDto: RegisterRequestDto) {
     await this.authService.register(registerDto.email, registerDto.password);
@@ -46,16 +49,27 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('access_token');
-    return { message: 'Logout successful' };
+  @UseGuards(JwtAuthGuard)
+  logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return permissionGate(request, PermissionName.Viewer, () => {
+      response.clearCookie('access_token');
+      return Promise.resolve({ message: 'Logout successful' });
+    });
   }
 
   @ApiBearerAuth('jwt')
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  profile(@Req() request: Request) {
-    const claims = request.user;
-    return { claims };
+  profile(@Req() request: Request): Promise<CustomJwtPayload> {
+    return permissionGate(
+      request,
+      PermissionName.Viewer,
+      (_userKey, user): Promise<CustomJwtPayload> => {
+        return Promise.resolve(user);
+      },
+    );
   }
 }

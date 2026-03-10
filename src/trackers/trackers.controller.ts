@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Post,
   Query,
   Req,
@@ -16,7 +14,8 @@ import { ListTrackersResponseDto } from './dto/ListTrackersResponse.dto';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { DeleteTrackerRequestDto } from './dto/DeleteTrackerRequest.dto';
 import type { Request } from 'express';
-import { PermissionName } from 'src/users/entities/permissions.entity';
+import { permissionGate } from 'src/utils/permissionGate';
+import { PermissionName } from 'src/jwt/jwt-payload.type';
 
 @Controller('trackers')
 export class TrackersController {
@@ -24,37 +23,31 @@ export class TrackersController {
 
   @Post('register')
   @UseGuards(JwtAuthGuard)
-  async register(
+  register(
     @Req() request: Request,
     @Body() registerDto: RegisterTrackerRequestDto,
   ) {
-    const isAdmin = request.user?.permissions?.includes(PermissionName.Viewer);
-
-    // TODO: use permission
-    await this.trackersService.create(registerDto);
+    return permissionGate(request, PermissionName.TrackerRegister, () =>
+      this.trackersService.create(registerDto),
+    );
   }
 
   @Delete('delete')
   @UseGuards(JwtAuthGuard)
-  async delete(
+  delete(
     @Req() request: Request,
     @Query() registerDto: DeleteTrackerRequestDto,
   ) {
-    const isAdmin = request.user?.permissions?.includes(PermissionName.Viewer);
-
-    // TODO: use permission
-    await this.trackersService.remove(registerDto);
+    return permissionGate(request, PermissionName.TrackerDelete, () =>
+      this.trackersService.remove(registerDto),
+    );
   }
 
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  async list(@Req() request: Request): Promise<ListTrackersResponseDto> {
-    const userKey = request.user?.sub;
-
-    if (!userKey) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
-
-    return { trackers: await this.trackersService.list(userKey) };
+  list(@Req() request: Request): Promise<ListTrackersResponseDto> {
+    return permissionGate(request, PermissionName.TrackerList, (userKey) =>
+      this.trackersService.list(userKey).then((trackers) => ({ trackers })),
+    );
   }
 }
