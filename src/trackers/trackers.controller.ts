@@ -16,6 +16,7 @@ import { ListTrackersResponseDto } from './dto/ListTrackersResponse.dto';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { DeleteTrackerRequestDto } from './dto/DeleteTrackerRequest.dto';
 import type { Request } from 'express';
+import { PermissionName } from 'src/users/entities/permissions.entity';
 
 @Controller('trackers')
 export class TrackersController {
@@ -23,14 +24,24 @@ export class TrackersController {
 
   @Post('register')
   @UseGuards(JwtAuthGuard)
-  async register(@Body() registerDto: RegisterTrackerRequestDto) {
+  async register(
+    @Req() request: Request,
+    @Body() registerDto: RegisterTrackerRequestDto,
+  ) {
+    const isAdmin = request.user?.permissions?.includes(PermissionName.Viewer);
+
     // TODO: use permission
     await this.trackersService.create(registerDto);
   }
 
   @Delete('delete')
   @UseGuards(JwtAuthGuard)
-  async delete(@Query() registerDto: DeleteTrackerRequestDto) {
+  async delete(
+    @Req() request: Request,
+    @Query() registerDto: DeleteTrackerRequestDto,
+  ) {
+    const isAdmin = request.user?.permissions?.includes(PermissionName.Viewer);
+
     // TODO: use permission
     await this.trackersService.remove(registerDto);
   }
