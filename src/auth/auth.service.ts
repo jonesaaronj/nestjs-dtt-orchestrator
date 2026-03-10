@@ -7,8 +7,8 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'node:crypto';
-import { JwtPayload } from 'src/jwt/jwt-payload.type';
 import { PermissionName } from 'src/users/entities/permissions.entity';
+import { CustomJwtPayload } from 'src/jwt/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +45,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload: JwtPayload = {
+    const payload: CustomJwtPayload = {
       sub: user.key,
       permissions: [PermissionName.Viewer],
       // TODO: add claims

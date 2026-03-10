@@ -15,24 +15,26 @@ export class RatioService {
     private readonly userRatioRepository: Repository<UserRatio>,
   ) {}
 
-  async getRatio(userKey: string): Promise<Stats> {
-    const { uploaded, downloaded } = await this.ratioRepository
-      .createQueryBuilder('ratio')
-      .select('SUM(ratio.uploaded)', 'uploaded')
-      .addSelect('SUM(ratio.downloaded)', 'downloaded')
-      .where('ratio.user_key = :userKey', { userKey })
-      .getRawOne()
-      .then(
-        (
-          e: {
-            uploaded: number | string | null;
-            downloaded: number | string | null;
-          } | null,
-        ) => ({
-          uploaded: Number(e?.uploaded ?? '0'),
-          downloaded: Number(e?.downloaded ?? '0'),
-        }),
-      );
+  async getRatio(userKey: string, current: boolean): Promise<Stats> {
+    const { uploaded, downloaded } = current
+      ? await this.ratioRepository
+          .createQueryBuilder('ratio')
+          .select('SUM(ratio.uploaded)', 'uploaded')
+          .addSelect('SUM(ratio.downloaded)', 'downloaded')
+          .where('ratio.user_key = :userKey', { userKey })
+          .getRawOne()
+          .then(
+            (
+              e: {
+                uploaded: number | string | null;
+                downloaded: number | string | null;
+              } | null,
+            ) => ({
+              uploaded: Number(e?.uploaded ?? '0'),
+              downloaded: Number(e?.downloaded ?? '0'),
+            }),
+          )
+      : { uploaded: 0, downloaded: 0 };
 
     const userRatio = await this.userRatioRepository.findOneBy({
       userKey,
@@ -44,31 +46,34 @@ export class RatioService {
     };
   }
 
-  async reportRatio(ratio: Omit<Ratio, 'createdAt' | 'updatedAt'>) {
+  async reportRatio(
+    userKey: string,
+    ratio: Omit<Ratio, 'userKey' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Stats> {
     const record = await this.ratioRepository.findOneBy({
       infoHash: ratio.infoHash,
-      userKey: ratio.userKey,
+      userKey,
     });
 
     if (!record) {
-      await this.ratioRepository.save(ratio);
+      await this.ratioRepository.insert({ userKey, ...ratio });
     } else {
       // if peerId has changed compact the ratio to userRatio
       // before updating the record
       if (record.peerId !== ratio.peerId) {
         const userRatio = await this.userRatioRepository.findOneBy({
-          userKey: record.userKey,
+          userKey,
         });
 
         if (userRatio) {
           await this.incrementUserRatio(
-            record.userKey,
+            userKey,
             record.uploaded,
             record.downloaded,
           );
         } else {
-          await this.userRatioRepository.save({
-            userKey: record.userKey,
+          await this.userRatioRepository.insert({
+            userKey,
             uploaded: record.uploaded,
             downloaded: record.downloaded,
           });
@@ -76,12 +81,18 @@ export class RatioService {
       }
 
       // update record
-      record.peerId = ratio.peerId;
-      record.event = ratio.event;
-      record.uploaded = ratio.uploaded;
-      record.downloaded = ratio.downloaded;
-      await this.ratioRepository.save(record);
+      await this.ratioRepository.update(
+        { userKey },
+        {
+          peerId: ratio.peerId,
+          event: ratio.event,
+          uploaded: ratio.uploaded,
+          downloaded: ratio.downloaded,
+        },
+      );
     }
+
+    return await this.getRatio(userKey, false);
   }
 
   async incrementUserRatio(

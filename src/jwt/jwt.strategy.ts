@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import express from 'express';
-import { JwtPayload } from './jwt-payload.type';
+import { CustomJwtPayload } from './jwt-payload.type';
 import { JwksService } from 'src/jwks/jwks.service';
 
 function extractJWTfromCookie(request: express.Request): string | null {
@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload) {
+  validate(payload: CustomJwtPayload) {
     return payload;
   }
 }

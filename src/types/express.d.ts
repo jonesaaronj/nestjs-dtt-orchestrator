@@ -1,9 +1,7 @@
-import { JwtPayload } from 'src/auth/jwt-payload.type';
+import { CustomJwtPayload } from 'src/jwt/jwt-payload.type';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
+declare module 'express' {
+  export interface Request {
+    user?: CustomJwtPayload;
   }
 }

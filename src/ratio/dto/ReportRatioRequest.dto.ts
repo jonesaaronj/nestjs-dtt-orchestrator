@@ -11,11 +11,6 @@ export class ReportRatioRequestDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  userKey: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
   peerId: string;
 
   @ApiProperty({

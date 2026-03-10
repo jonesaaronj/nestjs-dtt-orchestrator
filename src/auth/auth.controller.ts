@@ -14,7 +14,6 @@ import { LoginResponseDto } from './dto/LoginResponse.dto';
 import { LoginRequestDto } from './dto/LoginRequest.dto';
 import { RegisterRequestDto } from './dto/RegisterRequest.dto';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
-import { JwtPayload } from 'src/jwt/jwt-payload.type';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -56,7 +55,7 @@ export class AuthController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   profile(@Req() request: Request) {
-    const claims = request.user as JwtPayload;
+    const claims = request.user;
     return { claims };
   }
 }
