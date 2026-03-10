@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TrackersService } from './trackers.service';
 import { RegisterTrackerRequestDto } from './dto/RegisterTrackerRequest.dto';
 import { ListTrackersRequestDto } from './dto/ListTrackersRequest.dto';
@@ -16,16 +24,16 @@ export class TrackersController {
     await this.trackersService.create(registerDto);
   }
 
-  @Post('delete')
+  @Delete('delete')
   @UseGuards(JwtAuthGuard)
-  async delete(@Body() registerDto: DeleteTrackerRequestDto) {
+  async delete(@Query() registerDto: DeleteTrackerRequestDto) {
     await this.trackersService.remove(registerDto);
   }
 
-  @Post('list')
+  @Get('list')
   @UseGuards(JwtAuthGuard)
   async list(
-    @Body() request: ListTrackersRequestDto,
+    @Query() request: ListTrackersRequestDto,
   ): Promise<ListTrackersResponseDto> {
     return { trackers: await this.trackersService.list(request.userKey) };
   }

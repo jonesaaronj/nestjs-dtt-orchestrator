@@ -12,6 +12,10 @@ import { UsersModule } from './users/users.module';
 import { JwksModule } from './jwks/jwks.module';
 import { TrackersModule } from './trackers/trackers.module';
 import { Tracker } from './trackers/trackers.entity';
+import { HealthModule } from './health/health.module';
+import { RatioModule } from './ratio/ratio.module';
+import { Ratio } from './ratio/entity/ratio.entity';
+import { UserRatio } from './ratio/entity/user_ratio.entity';
 
 @Module({
   imports: [
@@ -27,15 +31,16 @@ import { Tracker } from './trackers/trackers.entity';
         username: configService.get<string>('POSTGRES_USER', 'postgres'),
         password: configService.get<string>('POSTGRES_PASSWORD', 'password'),
         database: configService.get<string>('POSTGRES_DB', 'nest_auth_db'),
-        entities: [User, Role, Permission, Tracker],
+        entities: [User, Role, Permission, Tracker, Ratio, UserRatio],
         synchronize: true, // TODO: Disable in production
       }),
     }),
-
+    HealthModule,
     AuthModule,
     JwksModule,
     UsersModule,
     TrackersModule,
+    RatioModule,
   ],
   controllers: [AppController],
   providers: [AppService],
