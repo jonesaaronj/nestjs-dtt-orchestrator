@@ -13,10 +13,6 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
-    .setTitle('Stuff')
-    .setDescription('')
-    .setVersion('')
-    .addTag('')
     .addBearerAuth(
       {
         type: 'http',
