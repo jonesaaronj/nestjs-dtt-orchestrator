@@ -32,9 +32,9 @@ export class TrackersController {
     );
   }
 
-  @Delete('delete')
+  @Delete('remove')
   @UseGuards(JwtAuthGuard)
-  delete(
+  remove(
     @Req() request: Request,
     @Query() registerDto: DeleteTrackerRequestDto,
   ) {

@@ -19,51 +19,51 @@ import type { Request } from 'express';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Put('role/create')
+  @Put('create')
   @UseGuards(JwtAuthGuard)
-  createRole(@Req() request: Request, @Body() name: string) {
+  create(@Req() request: Request, @Body() name: string) {
     return permissionGate(request, PermissionName.RoleCreate, () =>
       this.rolesService.createRole(name),
     );
   }
 
-  @Patch('role/addPermission')
+  @Delete('remove')
   @UseGuards(JwtAuthGuard)
-  addRolePermission(
-    @Req() request: Request,
-    @Body() name: string,
-    @Body() permission: PermissionName,
-  ) {
-    return permissionGate(request, PermissionName.RoleAssignPermission, () =>
-      this.rolesService.addRolePermission(name, permission),
-    );
-  }
-
-  @Patch('role/removePermission')
-  @UseGuards(JwtAuthGuard)
-  removeRolePermission(
-    @Req() request: Request,
-    @Body() name: string,
-    @Body() permission: PermissionName,
-  ) {
-    return permissionGate(request, PermissionName.RoleCreate, () =>
-      this.rolesService.removeRolePermission(name, permission),
-    );
-  }
-
-  @Delete('role/delete')
-  @UseGuards(JwtAuthGuard)
-  removeRole(@Req() request: Request, @Param() name: string) {
+  remove(@Req() request: Request, @Param() name: string) {
     return permissionGate(request, PermissionName.RoleRemove, () =>
       this.rolesService.removeRole(name),
     );
   }
 
-  @Get('role/list')
+  @Get('list')
   @UseGuards(JwtAuthGuard)
   listRoles(@Req() request: Request) {
     return permissionGate(request, PermissionName.RoleList, () =>
       this.rolesService.listRole(),
+    );
+  }
+
+  @Patch('addPermission')
+  @UseGuards(JwtAuthGuard)
+  addPermission(
+    @Req() request: Request,
+    @Body() name: string,
+    @Body() permission: PermissionName,
+  ) {
+    return permissionGate(request, PermissionName.RoleAssignPermission, () =>
+      this.rolesService.addPermission(name, permission),
+    );
+  }
+
+  @Patch('removePermission')
+  @UseGuards(JwtAuthGuard)
+  removePermission(
+    @Req() request: Request,
+    @Body() name: string,
+    @Body() permission: PermissionName,
+  ) {
+    return permissionGate(request, PermissionName.RoleCreate, () =>
+      this.rolesService.removePermission(name, permission),
     );
   }
 }

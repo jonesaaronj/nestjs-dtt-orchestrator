@@ -23,7 +23,7 @@ export class RolesService {
     await this.roleRepository.find();
   }
 
-  async addRolePermission(name: string, permission: PermissionName) {
+  async addPermission(name: string, permission: PermissionName) {
     const role = await this.roleRepository.findOneBy({ name });
 
     if (role && !role.permissions.includes(permission)) {
@@ -32,7 +32,7 @@ export class RolesService {
     }
   }
 
-  async removeRolePermission(name: string, permission: PermissionName) {
+  async removePermission(name: string, permission: PermissionName) {
     const role = await this.roleRepository.findOneBy({ name });
 
     if (role) {

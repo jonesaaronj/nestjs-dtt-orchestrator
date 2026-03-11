@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -21,7 +22,7 @@ import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 export class RatioController {
   constructor(private readonly ratioService: RatioService) {}
 
-  @Post('report')
+  @Put('report')
   @UseGuards(JwtAuthGuard)
   reportRatio(
     @Body() reportRatioRequest: ReportRatioRequestDto,
