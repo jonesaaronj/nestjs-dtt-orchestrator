@@ -34,11 +34,24 @@ export class TorrentsController {
     );
   }
 
+  @Get('allowed')
+  @UseGuards(JwtAuthGuard)
+  async get(
+    @Req() request: Request,
+    @Query('infoHash') infoHash: string,
+  ): Promise<{ allowed: boolean }> {
+    return permissionGate(request, PermissionName.TrackerList, () =>
+      this.torrentService.get({ infoHash }),
+    ).then((e) => ({
+      allowed: !!e,
+    }));
+  }
+
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  list(@Req() request: Request): Promise<string[]> {
+  async list(@Req() request: Request): Promise<string[]> {
     return permissionGate(request, PermissionName.TrackerList, () =>
       this.torrentService.list(),
-    );
+    ).then((e) => e.map((e) => e.infoHash));
   }
 }

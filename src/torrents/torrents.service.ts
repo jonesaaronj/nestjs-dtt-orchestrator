@@ -18,7 +18,11 @@ export class TorrentsService {
     return this.torrentRepository.delete(data);
   }
 
-  async list(): Promise<string[]> {
-    return (await this.torrentRepository.find()).map((e) => e.infoHash);
+  async get(data: Partial<Torrent>): Promise<Torrent | null> {
+    return await this.torrentRepository.findOneBy(data);
+  }
+
+  async list(): Promise<Torrent[]> {
+    return await this.torrentRepository.find();
   }
 }

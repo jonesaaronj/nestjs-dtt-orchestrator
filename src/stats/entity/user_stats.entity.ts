@@ -6,8 +6,8 @@ import {
   Column,
 } from 'typeorm';
 
-@Entity('user_ratio')
-export class UserRatio {
+@Entity('user_stats')
+export class UserStats {
   @PrimaryColumn({ name: 'user_key' })
   userKey: string;
 

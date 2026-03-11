@@ -5,10 +5,10 @@ import {
   PrimaryColumn,
   Column,
 } from 'typeorm';
-import { TrackerEvent } from '../ratio.types';
+import { TrackerEvent } from '../stats.types';
 
-@Entity('ratio')
-export class Ratio {
+@Entity('stats')
+export class Stats {
   @PrimaryColumn({ name: 'info_hash' })
   infoHash: string;
 

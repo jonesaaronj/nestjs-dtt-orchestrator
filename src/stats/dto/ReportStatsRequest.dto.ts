@@ -1,8 +1,8 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { TrackerEvent } from '../ratio.types';
 import { ApiProperty } from '@nestjs/swagger';
+import { TrackerEvent } from '../stats.types';
 
-export class ReportRatioRequestDto {
+export class ReportStatsRequestDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()

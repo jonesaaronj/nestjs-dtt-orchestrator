@@ -4,7 +4,7 @@ export enum TrackerEvent {
   Stopped = 'stopped',
 }
 
-export type Stats = {
+export type DownloadStats = {
   uploaded: number;
   downloaded: number;
 };

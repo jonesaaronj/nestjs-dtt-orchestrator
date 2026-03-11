@@ -1,4 +1,4 @@
-export class GetRatioRequestDto {
+export class GetStatsRequestDto {
   //TODO: fix
   current: boolean;
 }

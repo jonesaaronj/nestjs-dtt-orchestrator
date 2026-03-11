@@ -1,4 +1,4 @@
-export class GetRatioResponseDto {
+export class GetStatsResponseDto {
   uploaded: number;
   downloaded: number;
 }
