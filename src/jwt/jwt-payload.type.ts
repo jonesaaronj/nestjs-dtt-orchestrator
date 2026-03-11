@@ -4,8 +4,12 @@ export enum PermissionName {
   Viewer = 'viewer',
 
   TrackerRegister = 'tracker:register',
-  TrackerDelete = 'tracker:delete',
+  TrackerRemove = 'tracker:remove',
   TrackerList = 'tracker:list',
+
+  TorrentRegister = 'torrent:register',
+  TorrentRemove = 'torrent:remove',
+  TorrentList = 'torrent:list',
 
   UserAssignRole = 'user:assign:role',
 

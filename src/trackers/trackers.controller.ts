@@ -38,7 +38,7 @@ export class TrackersController {
     @Req() request: Request,
     @Query() registerDto: DeleteTrackerRequestDto,
   ) {
-    return permissionGate(request, PermissionName.TrackerDelete, () =>
+    return permissionGate(request, PermissionName.TrackerRemove, () =>
       this.trackersService.remove(registerDto),
     );
   }
