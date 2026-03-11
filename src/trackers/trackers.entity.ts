@@ -8,10 +8,10 @@ import {
 
 @Entity('trackers')
 export class Tracker {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ unique: true })
+  @Column({ name: 'uri', unique: true })
   uri: string;
 
   @CreateDateColumn({ name: 'created_at' })

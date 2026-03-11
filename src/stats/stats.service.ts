@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Stats } from './entity/stats.entity';
 import { UserStats } from './entity/user_stats.entity';
 import { DownloadStats } from './stats.types';
+import { Torrent } from 'src/torrents/torrents.entity';
 
 @Injectable()
 export class StatsService {
@@ -13,74 +14,55 @@ export class StatsService {
 
     @InjectRepository(UserStats)
     private readonly userStatsRepository: Repository<UserStats>,
+
+    @InjectRepository(Torrent)
+    private readonly torrentsRepository: Repository<Torrent>,
   ) {}
-
-  async getStats(userKey: string, current: boolean): Promise<DownloadStats> {
-    const { uploaded, downloaded } = current
-      ? await this.statsRepository
-          .createQueryBuilder('stats')
-          .select('SUM(stats.uploaded)', 'uploaded')
-          .addSelect('SUM(stats.downloaded)', 'downloaded')
-          .where('stats.user_key = :userKey', { userKey })
-          .getRawOne()
-          .then(
-            (
-              e: {
-                uploaded: number | string | null;
-                downloaded: number | string | null;
-              } | null,
-            ) => ({
-              uploaded: Number(e?.uploaded ?? '0'),
-              downloaded: Number(e?.downloaded ?? '0'),
-            }),
-          )
-      : { uploaded: 0, downloaded: 0 };
-
-    const userStats = await this.userStatsRepository.findOneBy({
-      userKey,
-    });
-
-    return {
-      uploaded: uploaded + (userStats?.uploaded ?? 0),
-      downloaded: downloaded + (userStats?.downloaded ?? 0),
-    };
-  }
 
   async reportStats(
     userKey: string,
-    stats: Omit<Stats, 'userKey' | 'createdAt' | 'updatedAt'>,
-  ): Promise<DownloadStats> {
-    const record = await this.statsRepository.findOneBy({
-      infoHash: stats.infoHash,
+    { infoHash, ...stats }: Omit<Stats, 'userKey' | 'createdAt' | 'updatedAt'>,
+  ): Promise<DownloadStats | undefined> {
+    const torrentRecord = await this.torrentsRepository.findOneBy({
+      infoHash,
+    });
+
+    if (!torrentRecord) {
+      return;
+    }
+
+    const statsRecord = await this.statsRepository.findOneBy({
+      infoHash,
       userKey,
     });
 
-    if (!record) {
-      await this.statsRepository.insert({ userKey, ...stats });
+    if (!statsRecord) {
+      await this.statsRepository.insert({ userKey, infoHash, ...stats });
     } else {
       // if peerId has changed compact the stats to userStats
       // before updating the record
-      if (record.peerId !== stats.peerId) {
+      if (statsRecord.peerId !== stats.peerId) {
         const userStats = await this.userStatsRepository.findOneBy({
           userKey,
         });
 
         if (userStats) {
+          // take into account torrent ratio modifiers
           await this.incrementUserStats(
             userKey,
-            record.uploaded,
-            record.downloaded,
+            torrentRecord.uploadModifier * statsRecord.uploaded,
+            torrentRecord.downloadModifier * statsRecord.downloaded,
           );
         } else {
           await this.userStatsRepository.insert({
             userKey,
-            uploaded: record.uploaded,
-            downloaded: record.downloaded,
+            uploaded: statsRecord.uploaded,
+            downloaded: statsRecord.downloaded,
           });
         }
       }
 
-      // update record
+      // update torrent stats record
       await this.statsRepository.update(
         { userKey },
         {
@@ -114,5 +96,40 @@ export class StatsService {
       'downloaded',
       downloaded,
     );
+  }
+
+  async getStats(userKey: string, current: boolean): Promise<DownloadStats> {
+    const { uploaded, downloaded } = current
+      ? await this.statsRepository
+          .createQueryBuilder('stats')
+          .leftJoinAndSelect('stats.info_hash', 'torrent')
+          .select('SUM(torrent.upload_modifier + stats.uploaded)', 'uploaded')
+          .addSelect(
+            'SUM(torrent.download_modifier + stats.downloaded)',
+            'downloaded',
+          )
+          .where('stats.user_key = :userKey', { userKey })
+          .getRawOne()
+          .then(
+            (
+              e: {
+                uploaded: number | string | null;
+                downloaded: number | string | null;
+              } | null,
+            ) => ({
+              uploaded: Number(e?.uploaded ?? '0'),
+              downloaded: Number(e?.downloaded ?? '0'),
+            }),
+          )
+      : { uploaded: 0, downloaded: 0 };
+
+    const userStats = await this.userStatsRepository.findOneBy({
+      userKey,
+    });
+
+    return {
+      uploaded: uploaded + (userStats?.uploaded ?? 0),
+      downloaded: downloaded + (userStats?.downloaded ?? 0),
+    };
   }
 }

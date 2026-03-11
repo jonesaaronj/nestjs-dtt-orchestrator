@@ -11,10 +11,10 @@ export class UserStats {
   @PrimaryColumn({ name: 'user_key' })
   userKey: string;
 
-  @Column()
+  @Column({ name: 'uploaded' })
   uploaded: number;
 
-  @Column()
+  @Column({ name: 'downloaded' })
   downloaded: number;
 
   @CreateDateColumn({ name: 'created_at' })

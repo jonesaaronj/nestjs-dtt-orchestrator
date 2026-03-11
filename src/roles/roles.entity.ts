@@ -11,15 +11,18 @@ import { User } from 'src/users/users.entity';
 
 @Entity('roles')
 export class Role {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
+  @Column({ name: 'name' })
   name: string;
 
+  @Column({ name: 'users' })
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 
   @Column({
+    name: 'permissions',
     type: 'enum',
     enum: PermissionName,
     array: true,

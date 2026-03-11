@@ -4,30 +4,36 @@ import {
   UpdateDateColumn,
   PrimaryColumn,
   Column,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { TrackerEvent } from '../stats.types';
+import { Torrent } from 'src/torrents/torrents.entity';
 
 @Entity('stats')
 export class Stats {
   @PrimaryColumn({ name: 'info_hash' })
+  @OneToOne(() => Torrent, (torrent) => torrent.infoHash)
+  @JoinColumn()
   infoHash: string;
 
   @PrimaryColumn({ name: 'user_key' })
   userKey: string;
 
-  @Column({ unique: true })
+  @Column({ name: 'peer_id', unique: true })
   peerId: string;
 
   @Column({
+    name: 'event',
     type: 'enum',
     enum: TrackerEvent,
   })
   event: TrackerEvent;
 
-  @Column()
+  @Column({ name: 'uploaded' })
   uploaded: number;
 
-  @Column()
+  @Column({ name: 'downloaded' })
   downloaded: number;
 
   @CreateDateColumn({ name: 'created_at' })

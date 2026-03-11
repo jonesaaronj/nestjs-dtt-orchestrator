@@ -26,7 +26,7 @@ export class StatsController {
   reportStats(
     @Body() reportStatsRequest: ReportStatsRequestDto,
     @Req() request: Request,
-  ): Promise<ReportStatsResponseDto> {
+  ): Promise<ReportStatsResponseDto | undefined> {
     return permissionGate(request, PermissionName.Viewer, (userKey) =>
       this.statsService.reportStats(userKey, reportStatsRequest),
     );

@@ -12,22 +12,23 @@ import {
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ unique: true })
+  @Column({ name: 'email', unique: true })
   email!: string;
 
-  @Column()
+  @Column({ name: 'passowrd' })
   password: string;
 
-  @Column()
+  @Column({ name: 'key' })
   @Generated('uuid')
   key: string;
 
-  @Column({ default: true })
+  @Column({ name: 'validated', default: true })
   validated: boolean;
 
+  @Column({ name: 'roles' })
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()
   roles: Role[];
