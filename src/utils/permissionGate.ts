@@ -2,6 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { CustomJwtPayload, PermissionName } from 'src/jwt/jwt-payload.type';
 import { Request } from 'express';
 
+// TODO: add audit log?
 export const permissionGate = async <T>(
   request: Request,
   permissions: PermissionName | PermissionName[],

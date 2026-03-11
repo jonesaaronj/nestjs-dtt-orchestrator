@@ -44,11 +44,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const permissions = await this.usersService
-      .getPermissions(email)
-      .then((permissions) =>
-        permissions.map((permission) => permission.permission),
-      );
+    const permissions = await this.usersService.getPermissions(email);
 
     const payload: CustomJwtPayload = {
       sub: user.key,

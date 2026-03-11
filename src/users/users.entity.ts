@@ -1,3 +1,4 @@
+import { Role } from 'src/roles/roles.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,7 +9,6 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Role } from './roles.entity';
 
 @Entity('users')
 export class User {

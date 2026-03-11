@@ -1,33 +1,30 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  Column,
 } from 'typeorm';
-import { Role } from './roles.entity';
+import { PermissionName } from 'src/jwt/jwt-payload.type';
+import { User } from 'src/users/users.entity';
 
-// do not export
-enum PermissionName {
-  Viewer = 'viewer',
-  TrackerRegister = 'tracker:register',
-}
-
-@Entity('permissions')
-export class Permission {
+@Entity('roles')
+export class Role {
   @PrimaryGeneratedColumn()
   id: number;
+
+  name: string;
+
+  @ManyToMany(() => User, (user) => user.roles)
+  users: User[];
 
   @Column({
     type: 'enum',
     enum: PermissionName,
-    unique: true,
+    array: true,
   })
-  permission: PermissionName;
-
-  @ManyToMany(() => Role, (role) => role.permissions)
-  roles: Role[];
+  permissions: PermissionName[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

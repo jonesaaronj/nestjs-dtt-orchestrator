@@ -2,11 +2,10 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { RatioService } from './ratio.service';
 import { ReportRatioRequestDto } from './dto/ReportRatioRequest.dto';
@@ -16,12 +15,14 @@ import { ReportRatioResponseDto } from './dto/ReportRatioResponse.dto';
 import type { Request } from 'express';
 import { PermissionName } from 'src/jwt/jwt-payload.type';
 import { permissionGate } from 'src/utils/permissionGate';
+import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 
 @Controller('ratio')
 export class RatioController {
   constructor(private readonly ratioService: RatioService) {}
 
   @Post('report')
+  @UseGuards(JwtAuthGuard)
   reportRatio(
     @Body() reportRatioRequest: ReportRatioRequestDto,
     @Req() request: Request,
@@ -32,6 +33,7 @@ export class RatioController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   getRatio(
     @Query() getRatioRequest: GetRatioRequestDto,
     @Req() request: Request,

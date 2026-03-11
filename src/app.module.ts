@@ -4,9 +4,6 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entities/users.entity';
-import { Permission } from './users/entities/permissions.entity';
-import { Role } from './users/entities/roles.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwksModule } from './jwks/jwks.module';
@@ -16,6 +13,10 @@ import { HealthModule } from './health/health.module';
 import { RatioModule } from './ratio/ratio.module';
 import { Ratio } from './ratio/entity/ratio.entity';
 import { UserRatio } from './ratio/entity/user_ratio.entity';
+import { TorrentsModule } from './torrents/torrents.module';
+import { RolesModule } from './roles/roles.module';
+import { User } from './users/users.entity';
+import { Role } from './roles/roles.entity';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { UserRatio } from './ratio/entity/user_ratio.entity';
         username: configService.get<string>('POSTGRES_USER', 'postgres'),
         password: configService.get<string>('POSTGRES_PASSWORD', 'password'),
         database: configService.get<string>('POSTGRES_DB', 'nest_auth_db'),
-        entities: [User, Role, Permission, Tracker, Ratio, UserRatio],
+        entities: [User, Role, Tracker, Ratio, UserRatio],
         synchronize: true, // TODO: Disable in production
       }),
     }),
@@ -41,6 +42,8 @@ import { UserRatio } from './ratio/entity/user_ratio.entity';
     UsersModule,
     TrackersModule,
     RatioModule,
+    TorrentsModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/users.entity';
-import { Permission } from './entities/permissions.entity';
+import { PermissionName } from 'src/jwt/jwt-payload.type';
+import { Role } from 'src/roles/roles.entity';
+import { User } from './users.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
   ) {}
 
   async create(data: Partial<User>): Promise<User> {
@@ -28,7 +32,17 @@ export class UsersService {
       .then((e) => !!e);
   }
 
-  async getPermissions(email: string): Promise<Permission[]> {
+  async addRole(id: number, name: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    const role = await this.roleRepository.findOneBy({ name });
+
+    if (user && role) {
+      user.roles.push(role);
+      await this.userRepository.save(user);
+    }
+  }
+
+  async getPermissions(email: string): Promise<PermissionName[]> {
     return await this.userRepository
       .find({
         where: {
