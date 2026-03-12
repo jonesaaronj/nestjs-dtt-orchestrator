@@ -12,7 +12,7 @@ import { TorrentsService } from './torrents.service';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { permissionGate } from 'src/utils/permissionGate';
 import { PermissionName } from 'src/jwt/jwt-payload.type';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
 @Controller('torrents')
 export class TorrentsController {
@@ -20,7 +20,7 @@ export class TorrentsController {
 
   @Post('register')
   @UseGuards(JwtAuthGuard)
-  register(@Req() request: Request, @Body('infoHash') infoHash: string) {
+  register(@Req() request: FastifyRequest, @Body('infoHash') infoHash: string) {
     return permissionGate(request, PermissionName.TorrentRegister, () =>
       this.torrentService.create({ infoHash }),
     );
@@ -28,7 +28,7 @@ export class TorrentsController {
 
   @Delete('remove')
   @UseGuards(JwtAuthGuard)
-  remove(@Req() request: Request, @Query('infoHash') infoHash: string) {
+  remove(@Req() request: FastifyRequest, @Query('infoHash') infoHash: string) {
     return permissionGate(request, PermissionName.TorrentRemove, () =>
       this.torrentService.remove({ infoHash }),
     );
@@ -37,7 +37,7 @@ export class TorrentsController {
   @Get('allowed')
   @UseGuards(JwtAuthGuard)
   async get(
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
     @Query('infoHash') infoHash: string,
   ): Promise<{ allowed: boolean }> {
     return permissionGate(request, PermissionName.TrackerList, () =>
@@ -49,7 +49,7 @@ export class TorrentsController {
 
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  async list(@Req() request: Request): Promise<string[]> {
+  async list(@Req() request: FastifyRequest): Promise<string[]> {
     return permissionGate(request, PermissionName.TrackerList, () =>
       this.torrentService.list(),
     ).then((e) => e.map((e) => e.infoHash));

@@ -1,7 +1,7 @@
 import { CustomJwtPayload } from 'src/jwt/jwt-payload.type';
 
-declare module 'express' {
-  export interface Request {
+declare module 'fastify' {
+  export interface FastifyRequest {
     user?: CustomJwtPayload;
   }
 }

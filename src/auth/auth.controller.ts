@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/LoginResponse.dto';
 import { LoginRequestDto } from './dto/LoginRequest.dto';
@@ -17,6 +16,7 @@ import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CustomJwtPayload, PermissionName } from 'src/jwt/jwt-payload.type';
 import { permissionGate } from 'src/utils/permissionGate';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +31,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: LoginRequestDto,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) response: FastifyReply,
   ): Promise<LoginResponseDto> {
     const token = await this.authService.login(
       loginDto.email,
@@ -51,8 +51,8 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   logout(
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
+    @Req() request: FastifyRequest,
+    @Res({ passthrough: true }) response: FastifyReply,
   ) {
     return permissionGate(request, PermissionName.Viewer, () => {
       response.clearCookie('access_token');
@@ -63,7 +63,7 @@ export class AuthController {
   @ApiBearerAuth('jwt')
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  profile(@Req() request: Request): Promise<CustomJwtPayload> {
+  profile(@Req() request: FastifyRequest): Promise<CustomJwtPayload> {
     return permissionGate(
       request,
       PermissionName.Viewer,

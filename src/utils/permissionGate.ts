@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CustomJwtPayload, PermissionName } from 'src/jwt/jwt-payload.type';
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
 
 // TODO: add audit log?
 export const permissionGate = async <T>(
-  request: Request,
+  request: FastifyRequest,
   permissions: PermissionName | PermissionName[],
   fn: (userKey: string, user: CustomJwtPayload) => Promise<T>,
 ): Promise<T> => {

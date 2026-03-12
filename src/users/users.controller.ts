@@ -1,7 +1,7 @@
 import { Body, Controller, Patch, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { permissionGate } from 'src/utils/permissionGate';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { PermissionName } from 'src/jwt/jwt-payload.type';
 
@@ -12,7 +12,7 @@ export class UsersController {
   @Patch('addRole')
   @UseGuards(JwtAuthGuard)
   addRole(
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
     @Body() id: number,
     @Body() permission: PermissionName,
   ) {

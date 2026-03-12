@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { PermissionName } from 'src/jwt/jwt-payload.type';
 import { permissionGate } from 'src/utils/permissionGate';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
@@ -25,7 +25,7 @@ export class StatsController {
   @UseGuards(JwtAuthGuard)
   reportStats(
     @Body() reportStatsRequest: ReportStatsRequestDto,
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
   ): Promise<ReportStatsResponseDto | undefined> {
     return permissionGate(request, PermissionName.Viewer, (userKey) =>
       this.statsService.reportStats(userKey, reportStatsRequest),
@@ -36,7 +36,7 @@ export class StatsController {
   @UseGuards(JwtAuthGuard)
   getStats(
     @Query() getStatsRequest: GetStatsRequestDto,
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
   ): Promise<GetStatsResponseDto> {
     return permissionGate(request, PermissionName.Viewer, (userKey) =>
       this.statsService.getStats(userKey, getStatsRequest.current),

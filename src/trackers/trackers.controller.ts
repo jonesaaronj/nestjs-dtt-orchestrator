@@ -13,7 +13,7 @@ import { RegisterTrackerRequestDto } from './dto/RegisterTrackerRequest.dto';
 import { ListTrackersResponseDto } from './dto/ListTrackersResponse.dto';
 import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { DeleteTrackerRequestDto } from './dto/DeleteTrackerRequest.dto';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { permissionGate } from 'src/utils/permissionGate';
 import { PermissionName } from 'src/jwt/jwt-payload.type';
 
@@ -24,7 +24,7 @@ export class TrackersController {
   @Post('register')
   @UseGuards(JwtAuthGuard)
   register(
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
     @Body() registerDto: RegisterTrackerRequestDto,
   ) {
     return permissionGate(request, PermissionName.TrackerRegister, () =>
@@ -35,7 +35,7 @@ export class TrackersController {
   @Delete('remove')
   @UseGuards(JwtAuthGuard)
   remove(
-    @Req() request: Request,
+    @Req() request: FastifyRequest,
     @Query() registerDto: DeleteTrackerRequestDto,
   ) {
     return permissionGate(request, PermissionName.TrackerRemove, () =>
@@ -45,7 +45,7 @@ export class TrackersController {
 
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  list(@Req() request: Request): Promise<ListTrackersResponseDto> {
+  list(@Req() request: FastifyRequest): Promise<ListTrackersResponseDto> {
     return permissionGate(request, PermissionName.TrackerList, (userKey) =>
       this.trackersService.list(userKey).then((trackers) => ({ trackers })),
     );

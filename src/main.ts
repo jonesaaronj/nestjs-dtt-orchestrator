@@ -4,13 +4,24 @@ import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
 
   const configService = app.get<ConfigService>(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser());
+
+  await app.register(fastifyCookie, {
+    secret: 'my-secret', // Optional: for signed cookies
+  });
 
   const config = new DocumentBuilder()
     .addBearerAuth(
@@ -29,4 +40,4 @@ async function bootstrap() {
   await app.listen(configService.get<number>('PORT', 3000));
 }
 
-bootstrap();
+void bootstrap();
