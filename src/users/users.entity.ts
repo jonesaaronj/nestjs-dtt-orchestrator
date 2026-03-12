@@ -28,8 +28,8 @@ export class User {
   @Column({ name: 'validated', default: true })
   validated: boolean;
 
-  @Column({ name: 'roles' })
-  @ManyToMany(() => Role, (role) => role.users)
+  @Column({ name: 'roles', type: 'text', array: true })
+  @ManyToMany(() => Role, (role) => role)
   @JoinTable()
   roles: Role[];
 

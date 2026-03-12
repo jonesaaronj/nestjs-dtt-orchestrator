@@ -17,6 +17,7 @@ import { Role } from './roles/roles.entity';
 import { StatsModule } from './stats/stats.module';
 import { Stats } from './stats/entity/stats.entity';
 import { UserStats } from './stats/entity/user_stats.entity';
+import { Torrent } from './torrents/torrents.entity';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { UserStats } from './stats/entity/user_stats.entity';
         username: configService.get<string>('POSTGRES_USER', 'postgres'),
         password: configService.get<string>('POSTGRES_PASSWORD', 'password'),
         database: configService.get<string>('POSTGRES_DB', 'nest_auth_db'),
-        entities: [User, Role, Tracker, Stats, UserStats],
+        entities: [User, Role, Torrent, Tracker, Stats, UserStats],
         synchronize: true, // TODO: Disable in production
       }),
     }),

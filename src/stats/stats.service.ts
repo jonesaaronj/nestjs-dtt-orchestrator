@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Stats } from './entity/stats.entity';
 import { UserStats } from './entity/user_stats.entity';
 import { DownloadStats } from './stats.types';
 import { Torrent } from 'src/torrents/torrents.entity';
+import { Stats } from './entity/stats.entity';
 
 @Injectable()
 export class StatsService {
